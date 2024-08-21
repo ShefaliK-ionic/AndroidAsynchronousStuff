@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
@@ -26,7 +28,28 @@ class MainActivity : AppCompatActivity() {
 //          parallelExecutionViaAsync()
 //        launchJobFunctions()
 //        dispatcherSupportList()
- supervisorScopeForExecuteOtherEvenExcptionForSibling()
+// supervisorScopeForExecuteOtherEvenExcptionForSibling()
+        coroutineException()
+    }
+
+    private fun coroutineException() {
+      val coroutineExceptionHandler= CoroutineExceptionHandler { coroutineContext, throwable ->
+            Log.d("222","~~~CoroutineExceptionHandler~~~~~"+throwable.toString())
+        }
+
+
+        GlobalScope.launch(coroutineExceptionHandler) {
+
+            var parentJob=launch {
+                var job1 = launch {
+
+                        throw Exception("Sh excep")
+
+                }
+            }
+        }
+
+
     }
 
     private fun supervisorScopeForExecuteOtherEvenExcptionForSibling() {
@@ -44,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     var job2 = async {
-//                        Log.d("222", "~~~~job2~~~")
+                       Log.d("222", "~~~~job2~~~")
                         return@async "Shriti"
                     }
 
@@ -58,30 +81,53 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
-         //with launh
-          lifecycleScope.launch {
-              var job1 = async {
-                  try {
-                      throw Exception("TestLAUNCHExce")
-                  } catch (e: Exception) {
-                      Log.d("222", "~~~~launch~exc~complete~" + e)
+         //with launch
+//          lifecycleScope.launch {
+//              var job1 = launch {
+//                  try {
+//                      throw Exception("TestLAUNCHExce")
+//                  } catch (e: Exception) {
+//                      Log.d("222", "~~~~launch~exc~complete~" + e)
+//
+//                  }
+//              }
+//
+//
+//              var job2 = launch {
+//                  Log.d("222", "~~launch~~job2~~~")
+//
+//              }
+//
+//              var job3 = launch {
+//                  Log.d("222", "~launch~~~job3~~~")
+//
+//              }
+//
+//          }
 
-                  }
-              }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            supervisorScope {
+                var job1 = async {
+                    Log.d("222", "~~566~~")
+                    throw Exception("566 exce")
+                }
+
+                var job12 = async {
+                    Log.d("222", "~~566~~12")
+
+                }
 
 
-              var job2 = launch {
-                  Log.d("222", "~~launch~~job2~~~")
+                try {
+                    Log.d("222", "~~566~~" + job1.await())
+                    Log.d("222", "~~566~~" + job12.await())
+                } catch (e: Exception) {
 
-              }
-
-              var job3 = launch {
-                  Log.d("222", "~launch~~~job3~~~")
-
-              }
-
-          }
-
+                }
+            }
+        }
 
 
 

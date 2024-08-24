@@ -6,12 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
@@ -29,10 +29,44 @@ class MainActivity : AppCompatActivity() {
 //        launchJobFunctions()
 //        dispatcherSupportList()
 // supervisorScopeForExecuteOtherEvenExcptionForSibling()
-        coroutineException()
+//        coroutineExceptionHandler()
+        deferredObjectAsync()
     }
 
-    private fun coroutineException() {
+    private fun deferredObjectAsync() {
+        var deferredObj:Deferred<String>
+        GlobalScope.launch {
+            deferredObj= lifecycleScope.async(Dispatchers.IO) {
+                println("Running on B4 Async: ${Thread.currentThread().name}")
+
+                delay(1500)
+                println("Running on thread Async: ${Thread.currentThread().name}")
+
+                "Hi Shriti"
+
+
+            }
+
+
+
+            withContext(Dispatchers.Main,{
+                delay(100)
+                println("Switched to IO dispatcher on thread: ${Thread.currentThread().name}")
+
+            })
+
+            println("Switched to 999 dispatcher on thread: ${Thread.currentThread().name}")
+
+
+
+            Log.d("222", "~~deferredObj~~" + deferredObj.await())
+        }
+
+
+
+    }
+
+    private fun coroutineExceptionHandler() {
       val coroutineExceptionHandler= CoroutineExceptionHandler { coroutineContext, throwable ->
             Log.d("222","~~~CoroutineExceptionHandler~~~~~"+throwable.toString())
         }
@@ -40,10 +74,17 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch(coroutineExceptionHandler) {
 
-            var parentJob=launch {
+            var parentJob=            supervisorScope {
+
                 var job1 = launch {
 
                         throw Exception("Sh excep")
+
+                }
+
+                var job2 = launch {
+delay(1000)
+                  Log.d("222","~~~~JOB2~~`")
 
                 }
             }

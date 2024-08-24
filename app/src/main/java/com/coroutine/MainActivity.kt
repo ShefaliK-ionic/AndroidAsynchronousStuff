@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -30,8 +31,40 @@ class MainActivity : AppCompatActivity() {
 //        dispatcherSupportList()
 // supervisorScopeForExecuteOtherEvenExcptionForSibling()
 //        coroutineExceptionHandler()
-        deferredObjectAsync()
+//        deferredObjectAsync()
+        couroutineScope()
     }
+
+    private fun couroutineScope() {
+        lifecycleScope.launch {
+          var scope=  CoroutineScope(Job()+ Dispatchers.IO)
+
+            scope.launch {
+                var job1 = launch {
+                    try {
+
+                        throw Exception("TestExce")
+                    } catch (e: Exception) {
+                        Log.d("222", "~~~~supervisorScope~exc~complete~" + e)
+
+                    }
+                }
+
+                var job2 = async {
+                    delay(1500)
+                    Log.d("222", "~~~~job2~~~")
+
+                    return@async "Shriti"
+                }
+
+
+
+                Log.d("222", "~~~~supervisorScope~~complete~" + job2.await() + "~~")
+            }            }
+
+        }
+
+
 
     private fun deferredObjectAsync() {
         var deferredObj:Deferred<String>

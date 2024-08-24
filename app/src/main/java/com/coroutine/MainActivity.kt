@@ -32,7 +32,9 @@ class MainActivity : AppCompatActivity() {
 // supervisorScopeForExecuteOtherEvenExcptionForSibling()
 //        coroutineExceptionHandler()
 //        deferredObjectAsync()
-        couroutineScope()
+//        couroutineScope()
+
+
     }
 
     private fun couroutineScope() {
